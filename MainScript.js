@@ -17,7 +17,7 @@ let DrawingState = {
 
 let gridOn = true;
 let menu;
-let test;
+
 
 function setup(){
     createCanvas(width,height);
@@ -26,7 +26,6 @@ function setup(){
       }
 
      menu = new Menu();
-     test = new Test();
 }
 
 function drawGrid(_spacing){
