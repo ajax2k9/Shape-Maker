@@ -81,7 +81,7 @@ class Menu{
         this.button5.parent(this.menuBox);
         this.button6.parent(this.menuBox);
 
-        this.strokeBox = createP("Stoke");
+        this.strokeBox = createP("Stroke");
         this.strokeBox.parent(this.page);
         this.strokeBox.position(10,95);
         this.strokeBox.style("color","white");
