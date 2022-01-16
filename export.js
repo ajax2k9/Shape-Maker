@@ -1,4 +1,5 @@
 function Export(){
+    let points = [];
     nameStr = menu.input.value();
     const writer = createWriter(nameStr +'.js');
     
@@ -9,7 +10,7 @@ function Export(){
     writer.print("\t\t this.angle=0;");
     writer.print("\t\t this.scale=1;");
     writer.print("\t }");
-    writer.print("\tDraw(){");
+    writer.print("\t Draw(){");
     writer.print("\t\t push();");
     writer.print("\t\t translate(this.x,this.y);");
     writer.print("\t\t rotate(this.angle * PI / 180);");
@@ -19,7 +20,9 @@ function Export(){
         if(s.name == "line"){
             writer.print("\t\t stroke("+s.stroke.r+","+s.stroke.g+","+s.stroke.b+");");
             writer.print("\t\t strokeWeight("+s.stroke.thick+");");
-            writer.print("\t\t line("+p1.x+","+p1.y+","+p2.x+","+p2.y+");");
+            writer.print("\t\t line("+s.p1.x+","+s.p1.y+","+s.p2.x+","+s.p2.y+");");
+            points.push({x:s.p1.x,y:s.p1.y});
+            points.push({x:s.p2.x,y:s.p2.y});
         }
 
         if(s.name == "circle"){
@@ -64,6 +67,11 @@ function Export(){
             rect(x,y,w,h,s.radius);
 
             writer.print("\t\t rect("+x+","+y+","+w+","+h+","+s.radius+");");
+
+            points.push({x:s.p1.x,y:s.p1.y});
+            points.push({x:s.p2.x,y:s.p2.y});
+            points.push({x:s.p1.x,y:s.p2.y});
+            points.push({x:s.p2.x,y:s.p1.y});
         }
 
         if(s.name == "poly"){
@@ -81,17 +89,30 @@ function Export(){
                 writer.print("\t\t noFill();");
             }
 
-            writer.print("beginShape();");
+            writer.print("\t\t beginShape();");
             s.points.forEach(e => {
                 writer.print("\t\t vertex("+e.x+","+e.y+");");
+                points.push({x:e.x,y:e.y});
             });
-            writer.print("\t\t vertex("+s.points[0].x+","+s.points[0].y+");");
             writer.print("\t\t endShape();");
         }
     });
 
     writer.print("\t\t pop();");
     writer.print("\t }");
+
+    writer.print("\t GetPoints(){");
+    writer.print("\t\t if(this.points == undefined){");
+    writer.print("\t\t\t this.points =[]; ");
+    
+    points.forEach(p=>{
+        writer.print("\t\t\t this.points.push("+p.x+","+p.y+");");
+    });
+    writer.print("\t\t }");
+    writer.print("\t\t return this.points; ");
+    
+    writer.print("\t }");
+
     writer.print("}");
 
 
