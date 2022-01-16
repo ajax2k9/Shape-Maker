@@ -95,7 +95,7 @@ class Menu{
         this.polygon = createButton("polygon");
 
         this.rect = createButton("rect");
-        this.button5 = createButton("");
+        this.delete = createButton("delete");
         this.button6 = createButton("");
 
 
@@ -103,6 +103,7 @@ class Menu{
         this.rect.mousePressed(()=>ChangeState("rect"));
         this.circle.mousePressed(()=>ChangeState("circle"));
         this.polygon.mousePressed(()=>ChangeState("poly"));
+        this.delete.mousePressed(()=>{deleteMode = true; state = DrawingState.OFF;});
 
         this.page.addClass("menu");
         this.menuBox.addClass("menubox");
@@ -112,7 +113,7 @@ class Menu{
         this.polygon.parent(this.menuBox);
 
         this.rect.parent(this.menuBox);
-        this.button5.parent(this.menuBox);
+        this.delete.parent(this.menuBox);
         this.button6.parent(this.menuBox);
 
         this.strokeBox = new Label("Stroke",this.page,10,95,"white");
@@ -170,8 +171,10 @@ function ChangeState(_mode){
     state = DrawingState.OFF;
     mode = _mode;
     console.log("mode changed to "+ mode);
+    deleteMode = false;
 }
 
 function SavePicture(){
     saveCanvas(menu.input.value(), 'png');
 }
+

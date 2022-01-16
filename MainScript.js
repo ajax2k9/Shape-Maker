@@ -16,12 +16,17 @@ let DrawingState = {
 }
 
 let points = [];
-
+let deleteMode = false;
 let gridOn = true;
 let menu;
 
 let rotations = 16;
+let recording = false;
+let recorder;
+let chunks = [];
 
+const fr = 30;
+var canvas;
 class ColorMode{
     constructor(color,thick){
         this.r = color.r;
@@ -33,12 +38,15 @@ class ColorMode{
 }
 
 function setup(){
-    createCanvas(width,height);
+    let p5canvas = createCanvas(width,height);
+    canvas = p5canvas.canvas; 
+
     for (let element of document.getElementsByClassName("p5Canvas")) {
         element.addEventListener("contextmenu", (e) => e.preventDefault());
       }
 
      menu = new Menu();
+     record();
 }
 
 function drawGrid(_spacing){
@@ -101,7 +109,9 @@ function mousePressed() {
 
 
     if (mouseButton === LEFT) {
-        if(state == DrawingState.OFF){
+        if(deleteMode){
+            DeleteShape();
+        }else if(state == DrawingState.OFF){
             p1 = createVector(Smouse.x,Smouse.y);
             if(mode == "poly"){
                 points = [];
@@ -133,8 +143,6 @@ function mousePressed() {
                 case "poly":
                     p2 = createVector(Smouse.x,Smouse.y);
                     d = dist(points[0].x, points[0].y, p2.x, p2.y);
-                    console.log(d);
-
                     points.push(p2);
                     if(d<1){
                         shapes.push(SetPoly(points,stroke,fill));
@@ -312,6 +320,169 @@ function drawCurrentShape(){
     }
 }
 }
+
+
+
+
+function record() {
+  chunks.length = 0;
+  
+  let stream = document.querySelector('canvas').captureStream(fr);
+  
+  recorder = new MediaRecorder(stream);
+  
+  recorder.ondataavailable = e => {
+    if (e.data.size) {
+      chunks.push(e.data);
+    }
+  };
+  
+  recorder.onstop = exportVideo;
+  
+}
+
+function keyPressed() {
+    
+    // toggle recording true or false
+    recording = !recording
+    console.log(recording);
+    
+    // 82 is keyCode for r 
+    // if recording now true, start recording 
+    if (keyCode === 82 && recording ) {
+      
+      console.log("recording started!");
+      recorder.start();
+    } 
+    
+    // if we are recording, stop recording 
+    if (keyCode === 82 && !recording) {  
+      console.log("recording stopped!");
+      recorder.stop();
+    }
+    
+  }
+  
+
+function exportVideo(e) {
+  var blob = new Blob(chunks, { 'type' : 'video/webm' });
+
+    // Draw video to screen
+    var videoElement = document.createElement('video');
+    videoElement.setAttribute("id", Date.now());
+    videoElement.controls = true;
+    document.body.appendChild(videoElement);
+    videoElement.src = window.URL.createObjectURL(blob);
+  
+  // Download the video 
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style = 'display: none';
+  a.href = url;
+  a.download = 'newVid.webm';
+  a.click();
+  window.URL.revokeObjectURL(url);
+
+}
+
+
+function OnLine(_p1,_p2,_s){
+    if(_p1.dist(_s)<2) return true;
+    if(_p2.dist(_s)<2) return true;
+
+    if(_s.x < min(_p1.x,_p2.x)) return false;
+    if(_s.x > max(_p1.x,_p2.x)) return false;
+
+    if(_s.y < min(_p1.y,_p2.y)) return false;
+    if(_s.y > max(_p1.y,_p2.y)) return false;
+
+    let v1 = createVector(_p2.x -_p1.x,_p2.y - _p1.y);
+    let v2 = createVector(_p2.x -_s.x,_p2.y - _s.y);
+    
+    let ang = abs(v1.angleBetween(v2));
+    console.log(ang);
+
+    return ang < 0.05;
+
+}
+
+
+function DeleteShape(){
+    let index = -1;
+
+    for(let i = 0; i<shapes.length; i++){
+        if(shapes[i].name=="circle"){
+            let d = dist(shapes[i].p1.x,shapes[i].p1.y,Smouse.x,Smouse.y)
+            if(shapes[i].fill.toggle){
+                if(d < shapes[i].d/2){
+                    index = i;
+                    break;
+                }
+            }else{
+                if(abs(d *2 - shapes[i].d)<2){
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        if(shapes[i].name=="line"){
+            let s = shapes[i];
+            if(OnLine(s.p1,s.p2,Smouse)){
+                index = i;
+                break;
+            }
+        }
+
+        if(shapes[i].name=="rect"){
+            let d =[];
+            let s = shapes[i];
+            if(s.fill.toggle){
+                let found = Smouse.x >= s.p1.x && Smouse.x <= s.p2.x;
+                    found = found && Smouse.y >= s.p1.y && Smouse.y <= s.p2.y;
+
+                if(found){
+                    index = i;
+                    break;
+                }
+
+            }else{
+                let v1 = createVector(s.p1.x,s.p1.y);
+                let v2 = createVector(s.p1.x,s.p2.y);
+                let v3 = createVector(s.p2.x,s.p2.y);
+                let v4 = createVector(s.p2.x,s.p1.y);
+                
+                if(OnLine(v1,v2,Smouse)){index = i; break}
+                if(OnLine(v2,v3,Smouse)){index = i; break}
+                if(OnLine(v3,v4,Smouse)){index = i; break}
+                if(OnLine(v4,v1,Smouse)){index = i; break}
+            }
+        }
+
+        if(shapes[i].name=="poly"){
+            let s = shapes[i];
+            let found = false;
+            s.points.forEach(  e=>{
+            let d = dist(e.x,e.y,Smouse.x,Smouse.y);
+                if (d<2){
+                    found = true;
+                }
+            });
+
+            if(found){
+                index = i;
+                break;
+            }
+        }
+    }
+
+    if(index != -1){
+        shapes.splice(index,1);
+    }
+
+}
+
 
 function draw(){
     background(0,0,0);
