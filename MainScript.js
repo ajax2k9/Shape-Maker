@@ -520,3 +520,99 @@ circle(Smouse.x,Smouse.y,10);
 
 menu.Draw();
 }
+
+
+function EncodeLine(_l){
+    let obj = {};
+
+    obj.name = "line";
+    obj.p1x = _l.p1.x;
+    obj.p1y = _l.p1.y;
+    obj.p2x = _l.p2.x;
+    obj.p2y = _l.p2.y;
+    obj.s = _l.stroke;
+
+    return obj;
+}
+
+function DecodeLine(_l){
+    return SetLine(createVector(_l.p1x,_l.p1y),createVector(_l.p2x,_l.p2y),_l.s);
+}
+
+function EncodeCircle(_l){
+
+    let obj = {};
+
+    obj.name = "circle";
+    obj.p1x = _l.p1.x;
+    obj.p1y = _l.p1.y;
+    obj.d = _l.d/2;
+    obj.s = _l.stroke;
+    obj.f = _l.fill;
+
+    return obj;
+}
+
+function DecodeCircle(_l){
+    return SetCircle(createVector(_l.p1x,_l.p1y),_l.d,_l.s,_l.f)
+}
+
+function EncodePoly(_points,_stroke,_fill){
+    return {name:"poly",points:_points,stroke:_stroke,fill:_fill};
+}
+
+
+function EncodeRect(_l){
+    let obj = {};
+
+    obj.name = "rect";
+    obj.p1x = _l.p1.x;
+    obj.p1y = _l.p1.y;
+    obj.p2x = _l.p2.x;
+    obj.p2y = _l.p2.y;
+    obj.s = _l.stroke;
+    obj.f = _l.fill;
+    obj.r = _l.radius;
+
+
+    return obj;
+}
+
+function DecodeRect(_l){
+    return SetRect(createVector(_l.p1x,_l.p1y),createVector(_l.p2x,_l.p2y),_l.s,_l.f,_l.r)
+}
+
+function saveData(){
+    let conv = [];    
+    shapes.forEach(s=>{
+        if(s.name =="line"){
+            conv.push(EncodeLine(s));
+        }        
+        if(s.name =="circle"){
+            conv.push(EncodeCircle(s));
+        }
+        if(s.name =="rect"){
+            conv.push(EncodeRect(s));
+        }
+    });
+
+localStorage.setItem("shapes_file",JSON.stringify(conv));
+}
+
+function LoadData(){
+    let conv = [];
+    shapes = [];
+   conv = JSON.parse(localStorage.getItem("shapes_file"));
+   conv.forEach(c=>{
+
+    if(c.name == "line"){
+        shapes.push(DecodeLine(c));
+    }
+    if(c.name == "circle"){
+        shapes.push(DecodeCircle(c));
+    }
+    if(c.name == "rect"){
+        shapes.push(DecodeRect(c));
+    }
+   });
+}
