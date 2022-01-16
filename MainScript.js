@@ -439,14 +439,17 @@ function DeleteShape(){
             let d =[];
             let s = shapes[i];
             if(s.fill.toggle){
-                let found = Smouse.x >= s.p1.x && Smouse.x <= s.p2.x;
-                    found = found && Smouse.y >= s.p1.y && Smouse.y <= s.p2.y;
+                let found = true;
+                if(Smouse.x < min(s.p1.x,s.p2.x))found = false; 
+                if(Smouse.x > max(s.p1.x,s.p2.x))found = false; 
+                if(Smouse.y < min(s.p1.y,s.p2.y))found = false; 
+                if(Smouse.y > max(s.p1.y,s.p2.y))found = false; 
 
                 if(found){
                     index = i;
                     break;
                 }
-
+                
             }else{
                 let v1 = createVector(s.p1.x,s.p1.y);
                 let v2 = createVector(s.p1.x,s.p2.y);
