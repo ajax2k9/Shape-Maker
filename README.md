@@ -19,6 +19,26 @@ A paint like tool to make complex vector art / models and export as a .js file t
 - second left-click sets the radius
 - right-click cancels circle drawing
 
+## Drawing polygons
+- first left-click sets the first point
+- subsequent left clicks set the next points
+- finish drawing the loop by left clicking the first point
+- right-click cancels polygon drawing
+
+## Drawing rectangles
+- first left-click sets the first corner
+- second left click sets second corner
+- "radius" sets the radius on the corners
+- right-click cancels rectangle drawing
+
+## Save,load and clear
+-saving saves the current shapes to a local file - can be loaded in later sessions of Shape Maker
+-clearing deletes the current shapes
+-load pulls the local file saved to your pc
+
+## Repeat
+-sets the radial symmetry of the drawing
+
 ## Moving the canvas
 - WSAD keys pan the view around, useful for larger drawings
 
