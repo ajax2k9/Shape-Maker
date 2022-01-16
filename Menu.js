@@ -137,6 +137,21 @@ class Menu{
             gridOn = this.gridToggle.checked();
         });
 
+        this.saveButton = createButton("save");
+        this.saveButton.parent(this.gridToggle);
+        this.saveButton.position(0,-30);
+        this.saveButton.mousePressed(()=>{saveData();});
+
+        this.LoadButton = createButton("load");
+        this.LoadButton.parent(this.gridToggle);
+        this.LoadButton.position(50,-30);
+        this.LoadButton.mousePressed(()=>{LoadData();}); 
+        
+        this.clearButton = createButton("clear");
+        this.clearButton.parent(this.gridToggle);
+        this.clearButton.position(100,-30);
+        this.clearButton.mousePressed(()=>{shapes = [];});
+
         this.thick = new Slider("thickness",this.page,10,190,10,1);
         
         this.exportJS = createButton("Export JS");

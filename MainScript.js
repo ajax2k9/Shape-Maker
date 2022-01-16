@@ -557,9 +557,28 @@ function DecodeCircle(_l){
     return SetCircle(createVector(_l.p1x,_l.p1y),_l.d,_l.s,_l.f)
 }
 
-function EncodePoly(_points,_stroke,_fill){
-    return {name:"poly",points:_points,stroke:_stroke,fill:_fill};
+function EncodePoly(_l){
+    let obj = {};
+
+    obj.name = "poly";
+    obj.points = [];
+    _l.points.forEach(p=>{
+        obj.points.push({x:p.x,y:p.y});
+    });
+
+    obj.s = _l.stroke;
+    obj.f = _l.fill;
+    return obj;
 }
+function DecodePoly(_l){
+    let p = [];
+    _l.points.forEach(e=>{
+        p.push(createVector(e.x,e.y));
+    });
+
+    return SetPoly(p,_l.s,_l.f);
+}
+
 
 
 function EncodeRect(_l){
@@ -594,7 +613,11 @@ function saveData(){
         if(s.name =="rect"){
             conv.push(EncodeRect(s));
         }
+        if(s.name =="poly"){
+            conv.push(EncodePoly(s));
+        }
     });
+
 
 localStorage.setItem("shapes_file",JSON.stringify(conv));
 }
@@ -613,6 +636,9 @@ function LoadData(){
     }
     if(c.name == "rect"){
         shapes.push(DecodeRect(c));
+    }
+    if(c.name == "poly"){
+        shapes.push(DecodePoly(c));
     }
    });
 }
