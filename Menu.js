@@ -4,17 +4,17 @@ class ColorBox{
         this.g = 0;
         this.b = 0;
 
-        this.red = createSlider(0,255,255);
+        this.red = createSlider(0,8,255);
         this.red.parent(_parent);
         this.red.addClass("red");
         this.red.position(10,_y);
         
-        this.green = createSlider(0,255,0);
+        this.green = createSlider(0,8,0);
         this.green.parent(_parent);
         this.green.addClass("green");
         this.green.position(10,_y + 20);
 
-        this.blue = createSlider(0,255,0);
+        this.blue = createSlider(0,8,0);
         this.blue.parent(_parent);
         this.blue.addClass("blue");
         this.blue.position(10,_y+40);
@@ -44,11 +44,14 @@ class ColorBox{
 
     Draw(){
 
-        this.r = this.red.value();
-        this.g = this.green.value();
-        this.b = this.blue.value();
+        this.r = this.red.value()*256/8;
+        this.g = this.green.value()*256/8;
+        this.b = this.blue.value()*256/8;
 
         this.box.style("background-color","rgb("+this.r+","+this.g+","+this.b+")");
+        this.blue.style("background-image","linear-gradient(90deg,rgb("+this.r+","+this.g+",0),rgb("+this.r+","+this.g+",255))");
+        this.red.style("background-image","linear-gradient(90deg,rgb(0,"+this.g+","+this.b+"),rgb(255,"+this.g+","+this.b+"))");
+        this.green.style("background-image","linear-gradient(90deg,rgb("+this.r+",0,"+this.b+"),rgb("+this.r+",255,"+this.b+"))");
 
     }
 }
